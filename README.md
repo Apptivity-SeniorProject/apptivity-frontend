@@ -1,50 +1,66 @@
-# Welcome to your Expo app 👋
+# Apptivity Mobile Frontend 
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+Android ve Ios için frontend projesi
 
-## Get started
 
-1. Install dependencies
+# Docker Kurulum Kılavuzu (Frontend)
 
-   ```bash
-   npm install
-   ```
+Bu proje, React Native tabanlı hem web hem de mobil platformları destekleyen bir Expo uygulamasıdır. Bu dokümanda uygulamanın **Web** versiyonunun Docker üzerinde nasıl çalıştırılacağı açıklanmaktadır.
 
-2. Start the app
+Uygulamanın çalışacağı port **8081** olarak ayarlanacaktır.
 
-   ```bash
-   npx expo start
-   ```
+## 1. Gereksinimler
 
-In the output, you'll find options to open the app in a
+Sisteminizde aşağıdaki araçların kurulu olduğundan emin olun:
+- [Docker](https://docs.docker.com/get-docker/)
+- [Docker Compose](https://docs.docker.com/compose/install/) (Opsiyonel ama önerilir)
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+## 2. Docker İmajını Oluşturma (Build)
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
-
-## Get a fresh project
-
-When you're ready, run:
+Uygulamanın kök dizininde (`apptivity-frontend` klasöründe) aşağıdaki komutu çalıştırarak Docker imajını oluşturun:
 
 ```bash
-npm run reset-project
+docker build -t apptivity-frontend .
 ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+*Not: İmajın boyutunu küçültmek ve güvenliği artırmak için `Dockerfile` çok aşamalı (multi-stage) build kullanmaktadır (Node.js + Nginx).*
 
-## Learn more
+## 3. Konteyneri Çalıştırma (Run)
 
-To learn more about developing your project with Expo, look at the following resources:
+İmaj oluşturulduktan sonra konteyneri başlatmak için aşağıdaki komutu kullanın. Uygulama localhost üzerinde **8081** portundan dışarıya açılacaktır.
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+```bash
+docker run -d -p 8081:80 --name apptivity-frontend-app apptivity-frontend
+```
 
-## Join the community
+Komut açıklaması:
+- `-d`: Konteyneri arka planda çalıştırır.
+- `-p 8081:80`: Bilgisayarınızın `8081` portunu Nginx\'in içerde çalıştığı `80` portuna bağlar.
+- `--name apptivity-frontend-app`: Konteynere anlamlı bir isim verir.
 
-Join our community of developers creating universal apps.
+### 4. Uygulamaya Erişim
 
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+Konteyner çalışmaya başladıktan sonra tarayıcınızdan şu adrese giderek uygulamaya erişebilirsiniz:
+
+[http://localhost:8081](http://localhost:8081)
+
+## 5. Konteyneri Durdurma ve Silme
+
+Çalışan konteyneri durdurmak için:
+```bash
+docker stop apptivity-frontend-app
+```
+
+Durdurulmuş konteyneri silmek için:
+```bash
+docker rm apptivity-frontend-app
+```
+
+Eğer hem durdurup hem de silmek isterseniz (kısayol):
+```bash
+docker rm -f apptivity-frontend-app
+```
+
+---
+
+*Not: Eğer Backend servisi (örn. localhost:8080 adresinden) ile iletişim kurulacaksa, uygulamanın `.env` veya API konfigürasyon dosyalarına backend adresinin `http://localhost:8080$` (veya Docker ortamındaki backend ağ adınız) olarak verildiğinden emin olun.*

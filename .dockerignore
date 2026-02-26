@@ -1,0 +1,10 @@
+node_modules
+.git
+.expo
+.vscode
+.idea
+dist
+web-build
+Dockerfile
+docker.md
+*.md
